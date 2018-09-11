@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="col-md-4">
+  <h3>Choose Your Course</h3>
+  <form action="" method="post" name="post">
+    {{ form.hidden_tag() }}
+    {{ form.state.label }}
+    {{ form.state }}<br>
+    {{ form.course.label }}
+    {{ form.course }}<br>
+    {{ form.holes.label }}
+    {{ form.holes }}<br>
+    {{ form.submit }}
+  </form>
+
+  <!-- this is for testing purposes to see if data was gathered -->
+  {% if course and holes %}
+  <p>{{ course }}</p>
+  <p>{{ holes }}</p>
+  {% endif %}
+
+  {% for error in form.course.errors %}
+  {{ error }}
+  {% endfor %}
+
+  <p id="test"></p>
+
+  <!--
+  <script type="text/javascript">
+  $('#select_course').empty();
+  //$('#select_holes').attr('disabled', 'disabled');
+
+
+  $(document).ready(function(){
+      $("#select_state").change(function(){
+        var send = {
+            state: $('#select_state').val()
+        }
+        $.getJSON("http://localhost:5000/_get_courses", send, function(data) {
+            $('#test').hide();
+          };
+        });
+      });
+  });
+  </script>
+  -->
+
+
+  <script type="text/javascript">
+      $(document).ready(function() {
+          $('#select_course').attr('disabled', 'disabled');
+          $('#select_course').empty();
+          $('#select_holes').attr('disabled', 'disabled');
+          $('#select_state').on('change', function(event) {
+              $('#select_course').attr('disabled', 'disabled');
+              $('#select_course').empty();
+              $('#select_holes').attr('disabled', 'disabled');
+              $.ajax({
+                  data : {
+                      state : $('#select_state').val()
+                  },
+                  type : 'GET',
+                  url : '/_get_courses'
+              })
+              .done(function(data) {
+                  if (data.error) {
+                      alert(data.error);
+                  }
+                  else {
+                      //alert(data.course);
+                      $.each(data.course, function(index,value) {
+                          $('#select_course').append(
+                              $('<option>', {
+                                  value: value,
+                                  text: value
+                              })
+                          );
+                      $('#select_course').removeAttr('disabled');
+                      $('#select_holes').removeAttr('disabled');
+                      });
+                  }
+              });
+
+              event.preventDefault()
+          });
+      });
+
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <!--
+  <script type="text/javascript">
+  $(document).ready(function(){
+      $("p").click(function(){
+          $(this).hide();
+      });
+  });
+  </script>
+
+
+
+  <script type="text/javascript">
+  $(function() {
+
+      // jQuery selection for the 2 select boxes
+      var dropdown = {
+          state: $('#select_state'),
+          county: $('#select_course')
+      };
+
+      // call to update on load
+      updateCounties();
+
+      // function to call XHR and update county dropdown
+      function updateCounties() {
+          var send = {
+              state: dropdown.state.val()
+          };
+          dropdown.county.attr('disabled', 'disabled');
+          dropdown.county.empty();
+          $.getJSON("{{ url_for('get_courses') }}", send, function(data) {
+              if (!data.error) {
+                $.each(data, function(item) {
+                    dropdown.county.append(
+                        $('<option>', {
+                            value: item[0],
+                            text: item[1]
+                        })
+                    );
+                dropdown.county.removeAttr('disabled');
+                });
+              }
+              else {
+                alert(data.error)
+              }
+          });
+      }
+
+      // event listener to state dropdown change
+      dropdown.state.on('change', function() {
+          updateCounties();
+      });
+
+  });
+  </script>
+  -->
+</div>
+
+
+{% endblock %}

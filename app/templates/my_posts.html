@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="col-md-6">
+  {% if not posts %}
+    <p>There are no rounds submitted</p>
+  {% else %}
+    {% for post in posts %}
+      <p>{{ post.id}}: {{post.course}} {{post.timestamp}} <a href="{{ url_for('view_round', id=post.id) }}">View</a> </p>
+    {% endfor %}
+  {% endif %}
+
+  <p>Filter</p>
+  <form action="" method="post" name="post">
+    {{ form.hidden_tag() }}
+    <p>{{ form.tourney.label }}{{ form.tourney }}</p>
+    <p>{{ form.holes.label }}{{ form.holes }}</p>
+    <p>{{ form.course.label }}{{ form.course }}</p>
+    <p>{{ form.classifier.label }} {{ form.classifier }}</p>
+
+    {{ form.submit }}
+  </form>
+
+  <div id='chart'>
+    <embed type="image/svg+xml" src={{line_chart|safe}} width="800" height="700">
+  </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ df_for_show|safe }}
+<p></p>
+GIR: {{ gir }}<br>
+Scrambling: {{ scrambling }}<br>
+Fairways: {{ fwy }}<br>
+Putts Per 9: {{ pp_nine }}<br>
+3 Putts per 9: {{ three_putts_9 }}<br>
+Putts Per 18: {{ pp_18 }}<br>
+3 Putts per 18: {{ three_putts_18 }}<br>
+<p></p>
+Holes per Eagle: {{ eagle_per_hole }}<br>
+Birdies per 9 Hole Rounds: {{ birdies_9 }}<br>
+Bogies per 9 Hole Rounds: {{ bogies_9 }}<br>
+Doubles or Worse Per 9 Hole Rounds: {{ double_worse_9}}<br>
+<p></p>
+Birdies per 18 Hole Rounds: {{ birdies_18 }}<br>
+Bogies per 18 Hole Rounds: {{ bogies_18 }}<br>
+Doubles or Worse Per 18 Hole Rounds: {{ double_worse_18}}<br>
+<p></p>
+Par 5 Average: {{ par5 }}<br>
+Par 4 Average: {{ par4 }}<br>
+Par 3 Average: {{ par3 }}<br>
+<p></p>
+Start Average (First 3): {{ start_avg }}<br>
+End Average (Last 3): {{ end_avg }}
+<p></p>
+GIR Given Fairway Hit: {{ gir_frwy }}<br>
+GIR Given No Fairway Hit: {{ gir_no_frwy }}<br>
+<p></p>
+
+GIR on Par 3: {{ gir_par3 }}<br>
+<p></p>
+Score (To Par) Given Green Hit: {{ rel_score_gir }}
+<p></p>
+Total Rounds: {{ total_rounds }}<br>
+Under Par Rounds: {{ under_par_rounds }}<br>
+Over Par Rounds: {{ over_par_rounds }}<br>
+Total Score (To Par): {{ total_score }}<br>
+
+
+{% endblock %}

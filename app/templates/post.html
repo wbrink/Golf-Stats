@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>{{ course_name }}</h2>
+  <form action="" method="post" name="post">
+    {{ form.hidden_tag() }}
+    {{ form.tourney.label }}
+    {{ form.tourney() }}
+    <p></p>
+    <table>
+      <tr>
+        <th>Hole</th>
+        <th>Par</th>
+        <th>Score</th>
+        <th>GIR (1 or 0)</th>
+        <th>Fairway (1 or 0)</th>
+        <th>Putts</th>
+      </tr>
+      {% for k,v in course_info %}
+      <tr>
+        <td>{{ v[0] }}</td>
+        <td>{{ v[1] }}</td>
+        <td>{{ form.scores[k] }}</td>
+        <td>{{ form.gir[k] }}</td>
+        <td>{{ form.fairway[k] }}</td>
+        <td>{{ form.putts[k] }}</td>
+      </tr>
+      {% endfor %}
+<!--      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+
+        <td>{{ form.submit }}</td>
+        <td><input type='submit' value='Submit'></td>
+      </tr>-->
+    </table>
+
+    <p></p>
+    {{ form.classifier.label }}
+    {{ form.classifier }}
+    <p>{{form.notes.label}}</p>
+    {{ form.notes(size=140) }}<br>
+    <p>{{ form.submit }}</p>
+
+  </form>
+
+  {% for error in form.tourney.errors %}
+  <span style="color: red;">Score: [{{ error }}]</span><br>
+  {% endfor %}
+
+
+  {% for error in form.scores.errors %}
+  <span style="color: red;">Score: [{{ error }}]</span><br>
+  {% endfor %}
+
+
+  {% for error in form.gir.errors %}
+  <span style="color: red;">GIR: [{{ error }}]</span><br>
+  {% endfor %}
+
+  {% for error in form.putts.errors %}
+  <span style="color: red;">Putts: [{{ error }}]</span><br>
+  {% endfor %}
+
+  {% for error in form.fairway.errors %}
+  <span style="color: red;">Fairway: [{{ error }}]</span><br>
+  {% endfor %}
+
+  {% for error in form.classifier.errors %}
+  <span style="color: red;">classifier: [{{ error }}]</span><br>
+  {% endfor %}
+
+  {% for error in form.notes.errors %}
+  <span style="color: red;">Notes: [{{ error }}]</span><br>
+  {% endfor %}
+
+
+{% endblock %}

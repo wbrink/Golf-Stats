@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-md-6">
+  <h3>{{ course }}</h3>
+  {{ df_for_show|safe }}
+  <p>Par:{{ par }}</p>
+  <p><strong>Your Score:</strong>{{ score }}</p>
+  <p>Played: {{ classifier }}</p>
+  <p>Notes: {{ notes }}</p>
+  <p><strong>Fairways:</strong>{{ fairways }} </p>
+  <p><strong>Greens in Regulation:</strong>{{ gir }} </p>
+  <p><strong>Scrambling:</strong>{{ scrambling }} </p>
+  <p><strong>Putts:</strong>{{ putts }} </p>
+  <p><strong>Par 5 Scoring:</strong>
+    {% if par5s > 0 %}
+      +{{ par5s }}
+    {% else %}
+      {{ par5s }}
+    {% endif %}</p>
+  <p><strong>Par 4 Scoring:</strong>
+    {% if par4s > 0 %}
+      +{{ par4s }}
+    {% else %}
+      {{ par4s }}
+    {% endif %}</p>
+  <p><strong>Par 3 Scoring:</strong>
+    {% if par3s > 0 %}
+      +{{ par3s }}
+    {% else %}
+      {{ par3s }}
+    {% endif %}</p>
+
+  <p> <strong>First 3 Holes:</strong>
+    {% if start_scoring > 0 %}
+      +{{ start_scoring }}
+    {% else %}
+      {{ start_scoring }}
+    {% endif %}</p>
+
+  <p> <strong>Last 3 Holes:</strong>
+    {% if end_scoring > 0 %}
+      +{{ end_scoring  }}
+    {% else %}
+      {{ end_scoring  }}
+    {% endif %}</p>
+
+  <p><strong>GIR|Fariway Hit:</strong>{{ gir_given_fairway }} </p>
+  <p><strong>GIR| NO Fariway Hit:</strong>{{ gir_no_fairway }} </p>
+  <p> <strong>GIR| Par3:</strong> {{ gir_par3 }} </p>
+  <p> <strong>Score| GIR:</strong>
+    {% if score_gir > 0 %}
+      +{{ score_gir }}
+    {% else %}
+      {{ score_gir }}
+
+    <p>Birdies: {{ birdies }}</p>
+    <p>Eagles: {{ eagles }}</p>
+    <p>Bogies: {{ bogies }}</p>
+    <p>Doubles or Worse: {{ doubles_or_worse }}</p>
+
+
+
+
+
+    {% endif %}</p>
+
+</div>
+
+
+
+
+
+{% endblock %}

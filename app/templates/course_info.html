@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <p>Course Info</p>
+
+  <form action="" method="post" name="post">
+    {{ form.hidden_tag() }}
+    <p></p>
+    <table>
+      <tr>
+        <th>Hole</th>
+        <th>Par</th>
+      </tr>
+      {% for k in hole_numbers %}
+      <tr>
+        <td>{{ k+1 }}</td>
+        <td>{{ form.par[k] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <p>{{ form.submit }}</p>
+
+  </form>
+
+  {% for error in form.par.errors %}
+  <span style="color: red;">[{{ error }}]</span><br>
+  {% endfor %}
+
+
+{% endblock %}

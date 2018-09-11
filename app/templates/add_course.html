@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <p>Add Course</p>
+
+  <form action="" method="post" name="post">
+    {{ form.hidden_tag() }}
+    <p>{{ form.state.label }}{{ form.state }}</p>
+    <p>{{ form.course_name.label }}{{ form.course_name }}</p>
+    {% for error in form.course_name.errors %}
+    <span style='color: red;'>[{{ error }}]</span>
+    {% endfor %}
+    <p>{{ form.holes.label }}{{ form.holes }}</p>
+    {{ form.submit }}
+  </form>
+
+
+
+{% endblock %}
