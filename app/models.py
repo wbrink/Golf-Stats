@@ -9,6 +9,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     posts = db.relationship('Post', backref='user', lazy='dynamic')
+    registration_date = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     def __repr__(self):
         return "<User {}>".format(self.username)
@@ -23,7 +24,7 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     stats = db.Column(db.PickleType) # df of the form input
     course = db.Column(db.String(32), index=True)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    timestamp = db.Column(db.Date, index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     score = db.Column(db.Integer, index=True)
     tourney = db.Column(db.Boolean, index=True)

@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import collections
 import pygal
+import datetime
 
 
 ##################################
@@ -101,7 +102,6 @@ def update_output_div(course, holes, tourney):
 
 
 
-
 @app.route('/')
 @app.route('/index')
 #@login_required
@@ -116,14 +116,14 @@ def getting_started():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated: #attribute for every user because of usermixin added to User class
-        flash('You are already logged in in as [{}]'.format(current_user.username))
+        flash('You are already logged in as [{}]'.format(current_user.username))
         return redirect(url_for("index"))
 
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first() # returns the user object
         if user is None or not user.check_password(form.password.data): # checks if user is in database or if password matches up
-            flash("invalid username or password")
+            flash("invalid username or password", 'danger')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next') # grabs the redirected page that will be loaded after logging in
@@ -143,7 +143,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user!')
+        flash('Congratulations, you are now a registered user!', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
@@ -163,10 +163,13 @@ def game():
     form = RoundForm()
     form.course.choices = [(g.course, g.course) for g in Course.query.order_by('course')] # first arg in tuple needs to be string
     if form.validate_on_submit():
+        state = form.state.data
         course_name = form.course.data # course chosen
         holes = form.holes.data    # amount of holes played
+        date = form.date.data # datetime.date object
 
-        return redirect(url_for('post', course_name=course_name, holes=holes))
+        return redirect(url_for('post', state=state, course_name=course_name, holes=holes, date=date))
+
     return render_template('round.html', form=form)
 
 
@@ -179,6 +182,23 @@ def get_courses():
         return jsonify({'course': courses})
 
     return jsonify({'error': 'No Courses Available'})
+
+
+@app.route('/_get_holes')
+def get_holes():
+    state = request.args.get('state')
+    course = request.args.get('course')
+
+    course = Course.query.filter_by(course=course, state=state).first()
+    if course:
+        print(course.layout)
+        if len(course.layout['Hole']) > 9: # then the course has option for 18 holes or front or back
+            return jsonify({'holes': {'18': '18 Holes', 'front_nine': 'Front 9', 'back_nine': 'Back 9'}})
+        else: # the course can only be 9 holes long
+            return jsonify({'holes': {'front_nine':'9 holes'}}) # the index is front nine to match up with post route
+
+    return jsonify({'error': 'No Courses Available'})
+
     #state = request.args.get('state')
 
     #courses = [(row.course, row.course) for row in Course.query.filter_by(state=state).all()]
@@ -196,6 +216,13 @@ def post():
     # getting variables passed by /round in  url
     holes = request.args.get('holes') # type string
     course_name = request.args.get('course_name') #type string
+    state = request.args.get('state') # type string
+    date = request.args.get('date')
+
+    year, month, day = [int(i) for i in date.strip().split('-')]
+    # converting date to datetime.date object for database
+    date = datetime.date(year, month, day)
+    # print(date, type(date))
 
 
 
@@ -366,9 +393,10 @@ def post():
         df1 = pd.DataFrame(major_stats_dict)
 
 
+
         #Commit to Database in the Post table
         post = Post(stats=df, course=course_name, score=total_score, tourney=tourney, user=current_user,
-        eighteen=eighteen, nine=nine, statistics=df1, notes=notes, classifier=classifier)
+        eighteen=eighteen, nine=nine, statistics=df1, notes=notes, classifier=classifier, timestamp=date)
 
         db.session.add(post)
         db.session.commit()
@@ -412,7 +440,7 @@ def my_posts():
 
     posts = Post.query.filter_by(user_id=current_user.id).all()
     if not posts:
-        flash("There are no posts to be shown")
+        flash("There are no posts to be shown. Submit your round by visiting the 'Post' link on the navbar")
         return redirect(url_for('index'))
 
     df = visualizer(posts)
@@ -509,8 +537,12 @@ def allrounds(): # could implement a filter that is passed to url
     gir = '{}/{} or {}%'.format(a[0], a[1], round((a[0]/a[1])*100, 2))
 
     # scrambling
+
     a = [df['successful_scrambling'].sum(), df['attempts_scrambling'].sum()]
-    scrambling = '{}/{} or {}%'.format(a[0], a[1], round((a[0]/a[1])*100, 2))
+    if a[1] == 0: # if all the greens were hit
+        scrambling = "0/0"
+    else:
+        scrambling = '{}/{} or {}%'.format(a[0], a[1], round((a[0]/a[1])*100, 2))
 
     # fairways
     a = [df['fairways_hit'].sum(), df['total_fairways'].sum()]
@@ -559,6 +591,7 @@ def allrounds(): # could implement a filter that is passed to url
     # score relative to par given gir
     rel_score_gir = df['score_gir_relative'].sum() / df.shape[0]
 
+
     #under and over par Rounds
     under_par_rounds = df[df.rel_score < 0].shape[0]
     over_par_rounds = df[df.rel_score > 0].shape[0]
@@ -596,6 +629,8 @@ def view_round(id):
     classifier = post.classifier
     notes = post.notes
     course = post.course
+    unformatted_date = post.timestamp # of type datetime.datetime
+    date = unformatted_date.strftime("%A %B %d, %Y")     # Monday Sep. 12, 2018
 
     df_for_show = df.copy() # have to make copy or else original will be edited as well
     df_for_show.loc[df.Par==3, 'Fairway']= 'N/A'
@@ -624,7 +659,10 @@ def view_round(id):
     successful_scrambling = df_scrambling[df_scrambling <= 0].shape[0]
     attempts_scrambling = df_scrambling.shape[0]
     a = [successful_scrambling, attempts_scrambling]
-    scrambling = '{}/{} or {}%'.format(a[0], a[1], round((a[0]/a[1])*100, 2))
+    if a[1] == 0:
+        scrambling = "0/0"
+    else:
+        scrambling = '{}/{} or {}%'.format(a[0], a[1], round((a[0]/a[1])*100, 2))
 
     # calculate Putts
     putts = df['Putts'].sum()
@@ -686,6 +724,21 @@ def view_round(id):
     gir_par3 = [numerator, denominator]
     gir_par3 = "{}/{} or {}%".format(gir_par3[0], gir_par3[1], round((gir_par3[0]/gir_par3[1] * 100), 2))
 
+    # GIR for par4s
+    gir_par4 = df[df.Par == 4]
+    numerator = gir_par4.GIR.sum()
+    denominator = gir_par4.shape[0]
+    gir_par4 = [numerator, denominator]
+    gir_par4 = "{}/{} or {}%".format(gir_par4[0], gir_par4[1], round((gir_par4[0]/gir_par4[1] * 100), 2))
+
+    # GIR for par5s
+    gir_par5 = df[df.Par == 5]
+    numerator = gir_par5.GIR.sum()
+    denominator = gir_par5.shape[0]
+    gir_par5 = [numerator, denominator]
+    gir_par5 = "{}/{} or {}%".format(gir_par5[0], gir_par5[1], round((gir_par5[0]/gir_par5[1] * 100), 2))
+
+
     df_rel = df['Score'] - df['Par'] # series of relative score
     birdies = df_rel[df_rel == -1].shape[0]
     eagles = df_rel[df_rel == -2].shape[0]
@@ -693,14 +746,15 @@ def view_round(id):
     doubles_or_worse = df_rel[df_rel >= 2].shape[0]
 
 
-    df_for_show = df_for_show.to_html(index=False)
+    df_for_show = df_for_show.to_html(index=False, classes="table table-striped table-sm", justify='left')
 
 
-    return render_template('view_round.html',df_for_show=df_for_show, course=course, gir=gir_summary, scrambling=scrambling, putts=putts,
+
+    return render_template('view_round.html',df_for_show=df_for_show, course=course, date=date, gir=gir_summary, scrambling=scrambling, putts=putts,
     fairways=fairways_summary, par5s=par5_scoring, par4s=par4_scoring, par3s=par3_scoring, par=par, score=score,
     gir_given_fairway=gir_given_fairway, gir_no_fairway=gir_no_fairway, score_gir=score_gir, start_scoring=start_scoring,
     end_scoring=end_scoring, gir_par3=gir_par3, birdies=birdies, eagles=eagles, bogies=bogies, doubles_or_worse=doubles_or_worse,
-    classifier=classifier, notes=notes)
+    classifier=classifier, notes=notes, gir_par4=gir_par4, gir_par5=gir_par5)
 
 
 # being able to add course
@@ -712,6 +766,7 @@ def add_course():
         state = form.state.data
         course_name = form.course_name.data
         holes = form.holes.data
+
 
         return redirect(url_for('course_info', holes=holes, course_name=course_name, state=state))
     return render_template('add_course.html', form=form)
@@ -739,8 +794,19 @@ def course_info():
         db.session.add(course)
         db.session.commit()
 
-        flash('Course Added')
+        message = "{} Added to Database".format(course_name)
+        flash(message, 'success')
 
         return redirect(url_for('index'))
 
     return render_template('course_info.html', form=form, hole_numbers=hole_numbers)
+
+
+@app.route("/account/<username>")
+@login_required
+def account(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    if user:
+        number_of_posts = user.posts.all() # list of all the rounds that are posted by the user
+        number_of_posts = len(number_of_posts)
+    return render_template('account.html', number_of_posts=number_of_posts)

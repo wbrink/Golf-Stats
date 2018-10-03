@@ -37,14 +37,18 @@
 
       <div class="collapse navbar-collapse" id="navbarCollapse">
         {% if current_user.is_anonymous %}
-        <ul class="navbar-nav mr-auto">
+        <div class="navbar-nav ml-auto">
+            <a class="nav-link nav-item" href="{{url_for('login')}}">Login</a>
+            <a class="nav-link nav-item" href="{{url_for('register')}}">Register</a>
+        </div>
+        <!-- <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
             <a class="nav-link" href="{{ url_for('login') }}">Login <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item active">
             <a class="nav-link" href="{{ url_for('register') }}">Register <span class="sr-only">(current)</span></a>
           </li>
-        </ul>
+        </ul> -->
         {% else %}
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
@@ -56,10 +60,23 @@
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('add_course')}}">Add Course</a>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
-          </li>
+          </li> -->
         </ul>
+        <div class="navbar-nav">
+            <!-- <a class="nav-link" href="{{url_for('logout')}}">Logout</a> -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle ml-auto" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{ current_user.username }}
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{{url_for('account', username=current_user.username)}}">Account</a>
+                    <a class="dropdown-item" href="#">Edit Profile</a>
+                    <a class="dropdown-item" href="{{url_for('logout')}}">Logout</a>
+                </div>
+            </li>
+        </div>
 
 
         {% endif %}
@@ -72,16 +89,6 @@
 
     <hr>
     {% include "includes/_messages.html" %}
-    <!--
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}-->
 
 
     {% block content %}{% endblock %}

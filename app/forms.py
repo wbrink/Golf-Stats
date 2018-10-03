@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FieldList, SelectField, FormField, SelectMultipleField, RadioField, TextAreaField
 from wtforms.validators import DataRequired, Length, NumberRange, Email, EqualTo, ValidationError
 from app.models import User
+from wtforms.fields.html5 import DateField
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -15,9 +16,13 @@ class ScoreForm9(FlaskForm):
     fairway = FieldList(IntegerField('Fairway', validators=[NumberRange(min=0, max=1)]), min_entries=9)
     putts = FieldList(IntegerField('Putts'), min_entries=9)
     tourney = BooleanField("Tournament")
-    classifier = RadioField('How Did You Play?', choices=[('very_good','Very Good'), ('good','Good'), ('alright','Alright'), ('bad','Bad'), ('very_bad','Very Bad')], validators=[DataRequired()])
+    classifier = RadioField('How Did You Play?', choices=[('very_good','Very Good'), ('good','Good'), ('alright','Alright'), ('bad','Bad'), ('very_bad','Very Bad')], default='alright', validators=[DataRequired()])
     notes = TextAreaField('Notes', validators=[Length(max=140)])
     submit = SubmitField('Submit')
+
+    
+
+
 
 class ScoreForm18(FlaskForm):
     scores = FieldList(IntegerField('Score'), min_entries=18)
@@ -25,14 +30,16 @@ class ScoreForm18(FlaskForm):
     fairway = FieldList(IntegerField('Fairway', validators=[NumberRange(min=0, max=1)]), min_entries=18)
     putts = FieldList(IntegerField('Putts'), min_entries=18)
     tourney = BooleanField("Tournament")
-    classifier = RadioField('How Did You Play?', choices=[('Very Good','Very Good'), ('Good','Good'), ('Alright','Alright'), ('Bad','Bad')], validators=[DataRequired()])
+    classifier = RadioField('How Did You Play?', choices=[('Very Good','Very Good'), ('Good','Good'), ('Alright','Alright'), ('Bad','Bad')], default='Alright', validators=[DataRequired()])
     notes = TextAreaField('Notes', validators=[Length(max=140)])
     submit = SubmitField('Submit')
 
 class RoundForm(FlaskForm):
-    state = SelectField('State', choices=[('--Select State--','--Select State--'),('AL', 'AL'), ('AK', 'AK'), ('AZ', 'AZ'), ('AR', 'AR'), ('CA', 'CA'), ('CO', 'CO'), ('CT', 'CT'), ('DE', 'DE'), ('FL', 'FL'), ('GA', 'GA'), ('HI', 'HI'), ('ID', 'ID'), ('IL', 'IL'), ('IN', 'IN'), ('IA', 'IA'), ('KS', 'KS'), ('KY', 'KY'), ('LA', 'LA'), ('ME', 'ME'), ('MD', 'MD'), ('MA', 'MA'), ('MI', 'MI'), ('MN', 'MN'), ('MS', 'MS'), ('MO', 'MO'), ('MT', 'MT'), ('NE', 'NE'), ('NV', 'NV'), ('NH', 'NH'), ('NJ','NJ'), ('NM', 'NM'), ('NY', 'NY'), ('NC','NC'), ('ND', 'ND'), ('OH', 'OH'), ('OK', 'OK'), ('OR', 'OR'), ('PA', 'PA'), ('RI', 'RI'), ('SC', 'SC'), ('SD', 'SD'), ('TN', 'TN'), ('TX', 'TX'), ('UT', 'UT'), ('VT', 'VT'), ('VA', 'VA'), ('WA', 'WA'), ('WV', 'WV'), ('WI', 'WI'), ('WY', 'WY')], validators=[DataRequired()], id='select_state')
-    course = SelectField('Course', validators=[DataRequired()], id='select_course')
-    holes = SelectField('Holes', choices=[('18', '18'),('front_nine', 'Front 9'), ('back_nine', 'Back 9')], validators=[DataRequired()], id='select_holes')
+    state = SelectField('State', choices=[('','--Select State--'),('AL', 'AL'), ('AK', 'AK'), ('AZ', 'AZ'), ('AR', 'AR'), ('CA', 'CA'), ('CO', 'CO'), ('CT', 'CT'), ('DE', 'DE'), ('FL', 'FL'), ('GA', 'GA'), ('HI', 'HI'), ('ID', 'ID'), ('IL', 'IL'), ('IN', 'IN'), ('IA', 'IA'), ('KS', 'KS'), ('KY', 'KY'), ('LA', 'LA'), ('ME', 'ME'), ('MD', 'MD'), ('MA', 'MA'), ('MI', 'MI'), ('MN', 'MN'), ('MS', 'MS'), ('MO', 'MO'), ('MT', 'MT'), ('NE', 'NE'), ('NV', 'NV'), ('NH', 'NH'), ('NJ','NJ'), ('NM', 'NM'), ('NY', 'NY'), ('NC','NC'), ('ND', 'ND'), ('OH', 'OH'), ('OK', 'OK'), ('OR', 'OR'), ('PA', 'PA'), ('RI', 'RI'), ('SC', 'SC'), ('SD', 'SD'), ('TN', 'TN'), ('TX', 'TX'), ('UT', 'UT'), ('VT', 'VT'), ('VA', 'VA'), ('WA', 'WA'), ('WV', 'WV'), ('WI', 'WI'), ('WY', 'WY')], validators=[DataRequired()], id='select_state')
+    course = SelectField('Course', choices=[('--Select Course--','--Select Course--')], validators=[DataRequired()], id='select_course')
+    holes = SelectField('Holes', choices=[('--Select Holes--', '--Select Holes--'), ('18', '18 Holes'), ('front_nine', 'Front Nine'), ('back_nine', 'Back Nine')], validators=[DataRequired()], id='select_holes')
+    date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
+
     submit = SubmitField('Submit')
 
 class FilterForm(FlaskForm):
@@ -63,9 +70,9 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
 
 class AddCourseForm(FlaskForm):
-    state = SelectField('State', choices=[('--Select State--','--Select State--'),('AL', 'AL'), ('AK', 'AK'), ('AZ', 'AZ'), ('AR', 'AR'), ('CA', 'CA'), ('CO', 'CO'), ('CT', 'CT'), ('DE', 'DE'), ('FL', 'FL'), ('GA', 'GA'), ('HI', 'HI'), ('ID', 'ID'), ('IL', 'IL'), ('IN', 'IN'), ('IA', 'IA'), ('KS', 'KS'), ('KY', 'KY'), ('LA', 'LA'), ('ME', 'ME'), ('MD', 'MD'), ('MA', 'MA'), ('MI', 'MI'), ('MN', 'MN'), ('MS', 'MS'), ('MO', 'MO'), ('MT', 'MT'), ('NE', 'NE'), ('NV', 'NV'), ('NH', 'NH'), ('NJ','NJ'), ('NM', 'NM'), ('NY', 'NY'), ('NC','NC'), ('ND', 'ND'), ('OH', 'OH'), ('OK', 'OK'), ('OR', 'OR'), ('PA', 'PA'), ('RI', 'RI'), ('SC', 'SC'), ('SD', 'SD'), ('TN', 'TN'), ('TX', 'TX'), ('UT', 'UT'), ('VT', 'VT'), ('VA', 'VA'), ('WA', 'WA'), ('WV', 'WV'), ('WI', 'WI'), ('WY', 'WY')], validators=[DataRequired()])
+    state = SelectField('State', choices=[('','--Select State--'),('AL', 'AL'), ('AK', 'AK'), ('AZ', 'AZ'), ('AR', 'AR'), ('CA', 'CA'), ('CO', 'CO'), ('CT', 'CT'), ('DE', 'DE'), ('FL', 'FL'), ('GA', 'GA'), ('HI', 'HI'), ('ID', 'ID'), ('IL', 'IL'), ('IN', 'IN'), ('IA', 'IA'), ('KS', 'KS'), ('KY', 'KY'), ('LA', 'LA'), ('ME', 'ME'), ('MD', 'MD'), ('MA', 'MA'), ('MI', 'MI'), ('MN', 'MN'), ('MS', 'MS'), ('MO', 'MO'), ('MT', 'MT'), ('NE', 'NE'), ('NV', 'NV'), ('NH', 'NH'), ('NJ','NJ'), ('NM', 'NM'), ('NY', 'NY'), ('NC','NC'), ('ND', 'ND'), ('OH', 'OH'), ('OK', 'OK'), ('OR', 'OR'), ('PA', 'PA'), ('RI', 'RI'), ('SC', 'SC'), ('SD', 'SD'), ('TN', 'TN'), ('TX', 'TX'), ('UT', 'UT'), ('VT', 'VT'), ('VA', 'VA'), ('WA', 'WA'), ('WV', 'WV'), ('WI', 'WI'), ('WY', 'WY')], validators=[DataRequired()])
     course_name = StringField('Course', validators=[DataRequired()])
-    holes = SelectField('Number of Holes', choices=[('18 Holes', '18 Holes'), ('9 Holes', '9 Holes')])
+    holes = SelectField('Number of Holes', choices=[('', '9 or 18 Holes?'), ('18 Holes', '18 Holes'), ('9 Holes', '9 Holes')], validators=[DataRequired()])
     submit = SubmitField('Next')
 
 class CourseInfoForm18(FlaskForm):

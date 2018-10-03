@@ -1,175 +1,148 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="col-md-4">
+<div class="col-md-6">
   <h3>Choose Your Course</h3>
-  <form action="" method="post" name="post">
+  <form action="" method="post" name="post" id='form'>
     {{ form.hidden_tag() }}
-    {{ form.state.label }}
-    {{ form.state }}<br>
-    {{ form.course.label }}
-    {{ form.course }}<br>
-    {{ form.holes.label }}
-    {{ form.holes }}<br>
+
+    {{ form.state.label }}{{ form.state }}{% for error in form.state.errors %}<span style="color: red;">{{ error }}</span>{% endfor %}<br>
+
+    {{ form.course.label }}{{ form.course }}{% for error in form.course.errors %}<span style="color: red;">{{ error }}</span>{% endfor %}<br>
+
+    {{ form.holes.label }}{{ form.holes }}{% for error in form.holes.errors %}<span style="color: red;">{{ error }}</span>{% endfor %}<br>
+
+    {{form.date.label}}{{ form.date }}{% for error in form.date.errors %}<span style="color: red;">{{ error }}</span>{% endfor %}<br>
+
+
+
     {{ form.submit }}
   </form>
 
-  <!-- this is for testing purposes to see if data was gathered -->
-  {% if course and holes %}
-  <p>{{ course }}</p>
-  <p>{{ holes }}</p>
-  {% endif %}
 
-  {% for error in form.course.errors %}
-  {{ error }}
+
+  <!-- {% for error in form.course.errors %}
+  <div class="alert alert-danger">{{ error }}</div>
   {% endfor %}
+  {% for error in form.date.errors %}
+  <div class="alert alert-danger">{{ error }}</div>
+  {% endfor %} -->
 
   <p id="test"></p>
-
-  <!--
-  <script type="text/javascript">
-  $('#select_course').empty();
-  //$('#select_holes').attr('disabled', 'disabled');
+</div>
 
 
-  $(document).ready(function(){
-      $("#select_state").change(function(){
-        var send = {
-            state: $('#select_state').val()
-        }
-        $.getJSON("http://localhost:5000/_get_courses", send, function(data) {
-            $('#test').hide();
-          };
-        });
-      });
-  });
-  </script>
-  -->
+<script>
+    $(document).ready(function(){
+        $('#select_course').empty();
+        $('#select_holes').empty();
+        var state = $('#select_state').val();
 
-
-  <script type="text/javascript">
-      $(document).ready(function() {
-          $('#select_course').attr('disabled', 'disabled');
-          $('#select_course').empty();
-          $('#select_holes').attr('disabled', 'disabled');
-          $('#select_state').on('change', function(event) {
-              $('#select_course').attr('disabled', 'disabled');
-              $('#select_course').empty();
-              $('#select_holes').attr('disabled', 'disabled');
-              $.ajax({
-                  data : {
-                      state : $('#select_state').val()
-                  },
-                  type : 'GET',
-                  url : '/_get_courses'
-              })
-              .done(function(data) {
-                  if (data.error) {
-                      alert(data.error);
-                  }
-                  else {
-                      //alert(data.course);
-                      $.each(data.course, function(index,value) {
-                          $('#select_course').append(
-                              $('<option>', {
-                                  value: value,
-                                  text: value
-                              })
-                          );
-                      $('#select_course').removeAttr('disabled');
-                      $('#select_holes').removeAttr('disabled');
-                      });
-                  }
-              });
-
-              event.preventDefault()
-          });
-      });
-
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  <!--
-  <script type="text/javascript">
-  $(document).ready(function(){
-      $("p").click(function(){
-          $(this).hide();
-      });
-  });
-  </script>
-
-
-
-  <script type="text/javascript">
-  $(function() {
-
-      // jQuery selection for the 2 select boxes
-      var dropdown = {
-          state: $('#select_state'),
-          county: $('#select_course')
-      };
-
-      // call to update on load
-      updateCounties();
-
-      // function to call XHR and update county dropdown
-      function updateCounties() {
-          var send = {
-              state: dropdown.state.val()
-          };
-          dropdown.county.attr('disabled', 'disabled');
-          dropdown.county.empty();
-          $.getJSON("{{ url_for('get_courses') }}", send, function(data) {
-              if (!data.error) {
-                $.each(data, function(item) {
-                    dropdown.county.append(
+        if (state != '') {
+            $.getJSON("/_get_courses", {state : $("#select_state").val()}, function(json){
+                if (json.error) {
+                    alert(json.error)
+                }
+                else {
+                    $('#select_course').append(
                         $('<option>', {
-                            value: item[0],
-                            text: item[1]
+                            value: '',
+                            text: '--Select Course--'
                         })
                     );
-                dropdown.county.removeAttr('disabled');
+                    // console.log(json.course);
+                    $.each(json.course, function(index,value) {
+                        $('#select_course').append(
+                            $('<option>', {
+                                value: value,
+                                text: value
+                            })
+                        );
+                    });
+                }
+            });
+        }
+
+
+        $('#select_state').change(function() {
+            $('#select_course').empty();
+            $('#select_holes').empty();
+            // console.log("state has been changed");
+            // alert('something has happened');
+
+            if ($("#select_state").val() == '') { // if --select state -- is chosen
+                $('#select_course').empty();
+                $('#select_holes').empty();
+            }
+            else {
+                $.getJSON("/_get_courses", {state : $("#select_state").val()}, function(json){
+                    if (json.error) {
+                        alert(json.error)
+                    }
+                    else {
+                        $('#select_course').append(
+                            $('<option>', {
+                                value: '',
+                                text: '--Select Course--'
+                            })
+                        );
+                        // console.log(json.course);
+                        $.each(json.course, function(index,value) {
+                            $('#select_course').append(
+                                $('<option>', {
+                                    value: value,
+                                    text: value
+                                })
+                            );
+                        });
+                    }
                 });
-              }
-              else {
-                alert(data.error)
-              }
-          });
-      }
+            }
 
-      // event listener to state dropdown change
-      dropdown.state.on('change', function() {
-          updateCounties();
-      });
+        }); // end on change event for select course
 
-  });
-  </script>
-  -->
-</div>
+        $('#select_course').change(function() {
+            var State = $('#select_state').val();
+            var course_name = $(this).val();
+            $("#select_holes").empty();
+            // console.log(State + ' ' + course_name);
+
+            if (course_name == '') {
+                $('#select_holes').empty();
+                // console.log("got here")
+            }
+            else {
+                $.getJSON("/_get_holes", {course : course_name, state: State}, function(json){
+                    if (json.error) {
+                        alert(json.error)
+                    }
+                    else {
+                        // console.log(json.holes);
+                        $('#select_holes').append(
+                            $('<option>', {
+                                value: '',
+                                text: '--Select Holes--'
+                            })
+                        );
+                        // console.log(json.course);
+                        $.each(json.holes, function(index,value) {
+                            // console.log(index + ' ' + value);
+                            $('#select_holes').append(
+                                $('<option>', {
+                                    value: index,
+                                    text: value
+                                })
+                            );
+                        });
+                    }
+                }); // end ajax call
+            } // end else
+        }); // end on change event for select_course
+
+
+    });
+</script>
+
 
 
 {% endblock %}

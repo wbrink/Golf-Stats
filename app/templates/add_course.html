@@ -1,19 +1,63 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <p>Add Course</p>
-
-  <form action="" method="post" name="post">
+<div class="mb-4 col-md-4 offset-md-4">
+  <h1>Add Course</h1>
+  <form action="" method="post" name="post" id='form'>
     {{ form.hidden_tag() }}
-    <p>{{ form.state.label }}{{ form.state }}</p>
-    <p>{{ form.course_name.label }}{{ form.course_name }}</p>
+    <div class="form-label-group">
+        {{ form.state(class_='form-control', id='state') }}<br>
+    </div>
+    <!-- <p>{{ form.state.label }}{{ form.state(class_='form-control') }}</p> -->
+    <div class="form-label-group">
+        {{ form.course_name(class_='form-control', placeholder="Course Name") }}
+        {% for error in form.course_name.errors %}
+        <span style='color: red;'>[{{ error }}]</span>
+        {% endfor %}<br>
+    </div>
+    <!-- <p>{{ form.course_name.label }}{{ form.course_name(class_='form-control', placeholder="Course Name") }}</p>
     {% for error in form.course_name.errors %}
     <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
-    <p>{{ form.holes.label }}{{ form.holes }}</p>
-    {{ form.submit }}
-  </form>
+    {% endfor %} -->
+    <!-- <p>{{ form.holes.label }}{{ form.holes(class_='form-control') }}</p> -->
+    <div class="form-label-group">
+        {{ form.holes(class_='form-control', id='holes') }}
+    </div> <br>
+    <p>{{ form.submit(class_="btn btn-lg btn-primary btn-block", id="submitter") }}</p>
+    <div class="">
+        <p id='message1'></p>
+    </div>
 
+  </form>
+</div>
+
+<!--
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#form").submit(function(event){
+            var holes = $("#holes").val();
+            var state = $("#state").val();
+
+            if (holes == '') {
+                // event.preventDefault();
+                $("#message1").text("Holes not selected");
+                console.log('holes not selected');
+            }
+            if (state == '') {
+                // event.preventDefault();
+                $("#message2").text("State not selected");
+                console.log('state not selected');
+            }
+            if ((holes == '') || (state == '')){
+                event.preventDefault()
+                console.log('submit prevented')
+            }
+        });
+
+
+    });
+
+</script> -->
 
 
 {% endblock %}
